@@ -1,1 +1,0 @@
-target_sources(server PUBLIC main.cpp)
