@@ -1,6 +1,4 @@
-
-#include "Mine.h"
-#include "PrettyPrinters.h"
+#include "util/PrettyPrinters.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/spdlog.h"
 #include <iostream>
@@ -8,15 +6,6 @@
 #include <vector>
 
 int main() {
-    // Check that compiled libraries work with executable and gtest
-    Mine mine;
-    std::vector<std::vector<int>> grid = {{ 0, 6, 0},
-                                          { 5, 8, 7},
-                                          { 0, 9, 0}};
-
-    const int ans = mine.getMaximumGold(grid);
-    std::cout << ans << "\n";
-
     // spdlog
     spdlog::info("Sample Info output");
     spdlog::warn("Sample Warn output");

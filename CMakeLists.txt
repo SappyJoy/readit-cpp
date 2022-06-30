@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(hello-world
+project(readit
         LANGUAGES CXX
         VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
@@ -53,7 +53,6 @@ if(TARGET spdlog)
 endif()
 
 # libpqxx
-
 FetchContent_Declare(
   libpqxx
   GIT_REPOSITORY https://github.com/jtv/libpqxx.git
@@ -66,6 +65,23 @@ if(TARGET spdlog)
     message("-- libpqxx defined!")
 endif()
 
+# gtest
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.11.0
+  CMAKE_CACHE_ARGS "${googletest_cmake_args}"
+)
+FetchContent_MakeAvailable(googletest)
+
+# Function that provide simple adding Unit Tests
+function(ADD_GTEST TEST_NAME)
+  add_executable(${TEST_NAME} ${TEST_NAME}.cpp)
+  target_include_directories(${TEST_NAME} PUBLIC ${UNIT_UNDER_TEST_INCLUDE_DIR} )
+  target_link_libraries(${TEST_NAME} gtest gtest_main gmock gmock_main ${LIBRARY_NAME})
+  add_test(NAME ${TEST_NAME} COMMAND $<TARGET_FILE:${TEST_NAME}>)
+endfunction()
+
 # CCache
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
@@ -75,18 +91,7 @@ endif(CCACHE_FOUND)
 
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set (CMAKE_TEST_DIR ${CMAKE_BINARY_DIR}/test)
 
-set (PROGRAM_NAME readit-books)
-
-add_executable(${PROGRAM_NAME} src/main.cpp)
-add_subdirectory(src)
-
-# Link executable with libraries
-target_link_libraries(${PROGRAM_NAME}
-                      spdlog::spdlog
-                      pqxx
-)
-
-# Testing
 enable_testing()
-add_subdirectory(test)
+add_subdirectory(src)
