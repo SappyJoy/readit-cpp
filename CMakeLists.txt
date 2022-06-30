@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(hello-world
         LANGUAGES CXX
         VERSION 1.0)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         MESSAGE("-- Using Clang compiler")
@@ -23,10 +23,48 @@ mark_as_advanced(
         CMAKE_CXX_FLAGS_RELEASE
 )
 
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Code completion. Generates compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+#### Libraries ####
+
+# Libary binaries (e.g. tests) will be in this directory
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/third_party/bin)
+
+include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${PROJECT_SOURCE_DIR}/third_party CACHE PATH "Missing description." FORCE)
+
+# spdlog
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_TAG        v1.x
+)
+
+FetchContent_GetProperties(spdlog)
+if (NOT spdlog_POPULATED)
+    FetchContent_Populate(spdlog)
+    add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+endif()
+
+if(TARGET spdlog)
+    message("-- spdlog defined!")
+endif()
+
+# libpqxx
+
+FetchContent_Declare(
+  libpqxx
+  GIT_REPOSITORY https://github.com/jtv/libpqxx.git
+  GIT_TAG 7.7.3
+)
+
+FetchContent_MakeAvailable(libpqxx)
+
+if(TARGET spdlog)
+    message("-- libpqxx defined!")
+endif()
 
 # CCache
 find_program(CCACHE_FOUND ccache)
@@ -35,10 +73,19 @@ if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
 
+
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 set (PROGRAM_NAME readit-books)
 
 add_executable(${PROGRAM_NAME} src/main.cpp)
 add_subdirectory(src)
+
+# Link executable with libraries
+target_link_libraries(${PROGRAM_NAME}
+                      spdlog::spdlog
+                      pqxx
+)
 
 # Testing
 enable_testing()

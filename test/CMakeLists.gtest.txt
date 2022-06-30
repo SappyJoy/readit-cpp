@@ -1,6 +1,6 @@
 set(UNIT_UNDER_TEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
-# Downlad gtest lib
+# Download gtest lib
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${PROJECT_SOURCE_DIR}/third_party CACHE PATH "Missing description." FORCE)
 FetchContent_Declare(

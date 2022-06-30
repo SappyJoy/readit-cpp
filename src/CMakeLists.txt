@@ -1,3 +1,4 @@
+# Add here cpp files you want to compile
 add_library(${PROGRAM_NAME}_lib Mine.cpp)
 target_include_directories(${PROGRAM_NAME}_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
